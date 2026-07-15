@@ -30,7 +30,7 @@ Hermes Translate is a local-first translation tool that runs entirely on your ma
 
 **Supported document formats**
 
-- PDF (text-based; scanned PDFs require OCR pre-processing)
+- PDF (text-based; scanned PDFs require OCR pre-processing)(yay)
 - Word documents (`.docx`)
 - Plain text (`.txt`)
 
