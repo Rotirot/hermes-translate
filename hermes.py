@@ -34,6 +34,7 @@ LANGUAGE_PAIRS = [
 
 PAIR_LABELS = [f"{src} → {tgt}" for src, _, tgt, __ in LANGUAGE_PAIRS]
 
+
 # ── package guard ──────────────────────────────────────────────────────────────
 
 def _require(module, pip_name=None):
@@ -114,22 +115,20 @@ def extract_txt(path: str) -> str:
         return f.read()
 
 
-def save_as_txt(text: str, original_path: str, to_code: str) -> str:
-    p = Path(original_path)
-    out = p.parent / f"{p.stem}_translated_{to_code}.txt"
+def save_as_txt(text: str, stem: str, out_dir: str, to_code: str) -> str:
+    out = Path(out_dir) / f"{stem}_translated_{to_code}.txt"
     out.write_text(text, encoding="utf-8")
     return str(out)
 
 
-def save_as_docx(text: str, original_path: str, to_code: str) -> str:
+def save_as_docx(text: str, stem: str, out_dir: str, to_code: str) -> str:
     docx = _require("docx", "python-docx")
     if docx is None:
         return ""
-    p = Path(original_path)
     doc = docx.Document()
     for line in text.split("\n"):
         doc.add_paragraph(line)
-    out = p.parent / f"{p.stem}_translated_{to_code}.docx"
+    out = Path(out_dir) / f"{stem}_translated_{to_code}.docx"
     doc.save(str(out))
     return str(out)
 
@@ -181,8 +180,8 @@ class HermesApp(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("Hermes Translate")
-        self.geometry("900x700")
-        self.minsize(720, 540)
+        self.geometry("900x720")
+        self.minsize(720, 560)
         self.configure(bg=self.BG)
         self._apply_styles()
         self._build_ui()
@@ -252,20 +251,27 @@ class HermesApp(tk.Tk):
         self._tab_text(nb)
         self._tab_document(nb)
         self._tab_packages(nb)
+        self._build_footer()
 
     def _build_header(self):
         bar = tk.Frame(self, bg=self.SURFACE, height=52)
         bar.pack(fill="x")
         bar.pack_propagate(False)
-
         tk.Label(bar, text="  ⬡  Hermes Translate",
                  bg=self.SURFACE, fg=self.ACCENT2,
                  font=("Segoe UI", 13, "bold")).pack(side="left", padx=4)
-
         self._status_var = tk.StringVar(value="Ready")
         tk.Label(bar, textvariable=self._status_var,
                  bg=self.SURFACE, fg=self.MUTED,
                  font=("Segoe UI", 9)).pack(side="right", padx=20)
+
+    def _build_footer(self):
+        foot = tk.Frame(self, bg=self.SURFACE, height=28)
+        foot.pack(fill="x", side="bottom")
+        foot.pack_propagate(False)
+        tk.Label(foot, text="Crafted by Azmi Allusoglu",
+                 bg=self.SURFACE, fg=self.MUTED,
+                 font=("Segoe UI", 8)).pack(side="right", padx=16)
 
     # ── helper widgets ──
 
@@ -312,7 +318,6 @@ class HermesApp(tk.Tk):
         f = ttk.Frame(nb)
         nb.add(f, text="  Text  ")
 
-        # controls
         ctrl = tk.Frame(f, bg=self.BG)
         ctrl.pack(fill="x", padx=20, pady=(16, 6))
         tk.Label(ctrl, text="Language pair", bg=self.BG, fg=self.MUTED,
@@ -324,7 +329,6 @@ class HermesApp(tk.Tk):
         ttk.Button(ctrl, text="Clear", style="Ghost.TButton",
                    command=self._clear_text).pack(side="right", padx=8)
 
-        # split pane
         pane = tk.PanedWindow(f, orient="horizontal",
                               bg=self.BORDER, sashwidth=3, sashrelief="flat")
         pane.pack(fill="both", expand=True, padx=20, pady=(0, 4))
@@ -372,8 +376,9 @@ class HermesApp(tk.Tk):
         f = ttk.Frame(nb)
         nb.add(f, text="  Documents  ")
 
+        # Row 1: language pair + output format
         ctrl = tk.Frame(f, bg=self.BG)
-        ctrl.pack(fill="x", padx=20, pady=(16, 6))
+        ctrl.pack(fill="x", padx=20, pady=(16, 4))
         tk.Label(ctrl, text="Language pair", bg=self.BG, fg=self.MUTED,
                  font=("Segoe UI", 9)).pack(side="left")
         self._doc_pair = self._pair_combo(ctrl)
@@ -390,7 +395,25 @@ class HermesApp(tk.Tk):
                 font=("Segoe UI", 10)
             ).pack(side="left", padx=4)
 
-        # drop zone / picker
+        # Row 2: output folder selector
+        folder_row = tk.Frame(f, bg=self.BG)
+        folder_row.pack(fill="x", padx=20, pady=(0, 6))
+        tk.Label(folder_row, text="Output folder", bg=self.BG, fg=self.MUTED,
+                 font=("Segoe UI", 9)).pack(side="left")
+        self._out_folder_var = tk.StringVar(value="Same as source file")
+        self._out_folder_entry = tk.Entry(
+            folder_row, textvariable=self._out_folder_var,
+            bg=self.CARD, fg=self.TEXT, insertbackground=self.ACCENT2,
+            relief="flat", font=("Segoe UI", 9), width=46,
+            state="readonly", readonlybackground=self.CARD
+        )
+        self._out_folder_entry.pack(side="left", padx=(8, 6), ipady=4)
+        ttk.Button(folder_row, text="Browse…", style="Ghost.TButton",
+                   command=self._pick_output_folder).pack(side="left")
+        ttk.Button(folder_row, text="Reset", style="Ghost.TButton",
+                   command=self._reset_output_folder).pack(side="left", padx=4)
+
+        # Drop zone / picker
         zone = tk.Frame(f, bg=self.SURFACE)
         zone.pack(fill="x", padx=20, pady=(0, 6))
         tk.Label(zone, text="Supported: PDF · DOCX · TXT",
@@ -398,13 +421,15 @@ class HermesApp(tk.Tk):
                  font=("Segoe UI", 9)).pack(pady=(10, 4))
         ttk.Button(zone, text="Add files…", command=self._pick_files).pack(pady=(0, 10))
 
-        # file list
+        # File list
         self._doc_tree = ttk.Treeview(
-            f, columns=("name", "status"), show="headings", height=9
+            f, columns=("name", "folder", "status"), show="headings", height=8
         )
         self._doc_tree.heading("name",   text="File")
+        self._doc_tree.heading("folder", text="Source folder")
         self._doc_tree.heading("status", text="Status")
-        self._doc_tree.column("name",   width=560)
+        self._doc_tree.column("name",   width=220)
+        self._doc_tree.column("folder", width=320)
         self._doc_tree.column("status", width=220, anchor="center")
         self._doc_tree.pack(fill="both", expand=True, padx=20, pady=(0, 6))
 
@@ -419,6 +444,20 @@ class HermesApp(tk.Tk):
 
         self._doc_pb = self._progress(f)
 
+    def _pick_output_folder(self):
+        folder = filedialog.askdirectory(title="Select output folder")
+        if folder:
+            self._out_folder_var.set(folder)
+
+    def _reset_output_folder(self):
+        self._out_folder_var.set("Same as source file")
+
+    def _get_out_dir(self, source_path: str) -> str:
+        val = self._out_folder_var.get()
+        if val == "Same as source file":
+            return str(Path(source_path).parent)
+        return val
+
     def _pick_files(self):
         paths = filedialog.askopenfilenames(
             title="Select documents to translate",
@@ -428,7 +467,11 @@ class HermesApp(tk.Tk):
         for p in paths:
             if p not in existing:
                 self._doc_tree.insert("", "end", iid=p,
-                                      values=(os.path.basename(p), "Queued"))
+                                      values=(
+                                          os.path.basename(p),
+                                          str(Path(p).parent),
+                                          "Queued"
+                                      ))
 
     def _do_doc_translate(self):
         items = self._doc_tree.get_children()
@@ -450,10 +493,12 @@ class HermesApp(tk.Tk):
                         raise ValueError(f"Unsupported format: {ext}")
                     raw = extractor(path)
                     translated = translate_chunks(raw, fc, tc)
+                    out_dir = self._get_out_dir(path)
+                    stem = Path(path).stem
                     out = (save_as_docx if save_as == "docx" else save_as_txt)(
-                        translated, path, tc
+                        translated, stem, out_dir, tc
                     )
-                    msg = f"✓ {os.path.basename(out)}"
+                    msg = f"✓ → {os.path.basename(out)}"
                     self.after(0, lambda p=path, m=msg:
                                self._doc_tree.set(p, "status", m))
                 except Exception as e:

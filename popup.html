@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      width: 280px;
+      background: #13131f;
+      color: #e2e2f0;
+      font-family: "Segoe UI", sans-serif;
+      font-size: 13px;
+    }
+    .header {
+      background: #1e1e30;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid #2e2e50;
+    }
+    .header span { color: #a78bfa; font-weight: 700; font-size: 14px; }
+    .body { padding: 16px; }
+    label { display: block; color: #7070a0; font-size: 11px; margin-bottom: 5px; }
+    select {
+      width: 100%;
+      background: #252538;
+      color: #e2e2f0;
+      border: 1px solid #2e2e50;
+      border-radius: 6px;
+      padding: 7px 10px;
+      font-size: 13px;
+      margin-bottom: 14px;
+      appearance: none;
+      cursor: pointer;
+    }
+    .status {
+      color: #4ade80;
+      font-size: 11px;
+      text-align: center;
+      min-height: 16px;
+      margin-top: 4px;
+    }
+    .ping {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: #7070a0;
+      font-size: 11px;
+      margin-top: 12px;
+    }
+    .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: #7070a0;
+    }
+    .dot.online  { background: #4ade80; }
+    .dot.offline { background: #f87171; }
+    .footer {
+      padding: 8px 16px 12px;
+      color: #3a3a5c;
+      font-size: 10px;
+      text-align: right;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <span>⬡ Hermes Translate</span>
+  </div>
+  <div class="body">
+    <label>Default language pair</label>
+    <select id="pair"></select>
+    <div class="status" id="status"></div>
+    <div class="ping">
+      <div class="dot" id="dot"></div>
+      <span id="server-status">Checking server…</span>
+    </div>
+  </div>
+  <div class="footer">Crafted by Azmi Allusoglu</div>
+  <script src="popup.js"></script>
+</body>
+</html>
