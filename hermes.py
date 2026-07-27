@@ -265,13 +265,16 @@ class HermesApp(tk.Tk):
                  bg=self.SURFACE, fg=self.MUTED,
                  font=("Segoe UI", 9)).pack(side="right", padx=20)
 
-    def _build_footer(self):
+        def _build_footer(self):
         foot = tk.Frame(self, bg=self.SURFACE, height=28)
         foot.pack(fill="x", side="bottom")
         foot.pack_propagate(False)
-        tk.Label(foot, text="Crafted by Azmi Allusoglu",
-                 bg=self.SURFACE, fg=self.MUTED,
-                 font=("Segoe UI", 8)).pack(side="right", padx=16)
+        link = tk.Label(foot, text="Crafted by Azmi Allusoglu",
+                        bg=self.SURFACE, fg=self.MUTED,
+                        font=("Segoe UI", 8), cursor="hand2")
+        link.pack(side="right", padx=16)
+        link.bind("<Button-1>", lambda e: __import__("webbrowser").open(
+            "https://www.linkedin.com/in/azmi-a-9065647b/"))
 
     # ── helper widgets ──
 
