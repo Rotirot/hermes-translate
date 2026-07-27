@@ -9,7 +9,7 @@
 [![Powered by Argos](https://img.shields.io/badge/Engine-Argos%20Translate-7c6af7)](https://github.com/argosopentech/argos-translate)
 [![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey)]()
 
-![Hermes Translate](banner.png)
+<img src="banner.png" width="100%" alt="Hermes Translate — offline translation tool" />
 
 </div>
 
