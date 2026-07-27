@@ -229,6 +229,7 @@ Pull requests are welcome. For major changes, please open an issue first.
 
 Created by **Azmi Allusoglu**.
 Initial codebase scaffolded with the assistance of [Claude](https://claude.ai) by Anthropic.
+[Hermes icons](https://www.flaticon.com/free-icons/hermes) created by [Magnific](https://www.flaticon.com/authors/magnific) — Flaticon.
 
 ---
 
