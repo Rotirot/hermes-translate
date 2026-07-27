@@ -160,7 +160,6 @@ Keep this terminal open while browsing. The server only listens on localhost and
 3. Click **Load unpacked**
 4. Select the `browser-extension/` folder inside this repo
 
-> **Note:** Icons (`icon16.png`, `icon48.png`, `icon128.png`) are not included in the repo. The extension works without them, but Chrome will show a generic puzzle-piece icon. Add your own PNG icons to the `browser-extension/` folder if you want a custom look.
 
 ### Step 3 — Translate text on any page
 
