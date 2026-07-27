@@ -13,11 +13,8 @@
 <div align="center">
   <img src="banner.png" alt="Hermes Translate — offline translation tool" />
 </div>
-=======
-<img src="banner.png" width="50%" alt="Hermes Translate — offline translation tool" />
->>>>>>> d521345f507e9053323d3b4d225ed45412bd08c9
 
-</div>
+
 
 ---
 
