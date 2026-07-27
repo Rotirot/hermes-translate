@@ -265,7 +265,7 @@ class HermesApp(tk.Tk):
                  bg=self.SURFACE, fg=self.MUTED,
                  font=("Segoe UI", 9)).pack(side="right", padx=20)
 
-        def _build_footer(self):
+    def _build_footer(self):
         foot = tk.Frame(self, bg=self.SURFACE, height=28)
         foot.pack(fill="x", side="bottom")
         foot.pack_propagate(False)
